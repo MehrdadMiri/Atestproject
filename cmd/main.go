@@ -6,6 +6,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -46,6 +47,14 @@ func readLocation(reader *bufio.Reader) (command.Location, error) {
 	return command.Location{x, y}, nil
 }
 
+func readCommand(reader *bufio.Reader) (string, error) {
+	text, err := reader.ReadString(' ')
+	if err != nil {
+		return text, err
+	}
+	return text, nil
+}
+
 func readInt(reader *bufio.Reader) (int, error) {
 	text, err := readLine(reader)
 	if err != nil {
@@ -53,6 +62,15 @@ func readInt(reader *bufio.Reader) (int, error) {
 	}
 	text = strings.Replace(text, " ", "", -1)
 	res, err := strconv.Atoi(text)
+	return res, err
+}
+
+func readFloat(reader *bufio.Reader) (float64, error) {
+	text, err := readLine(reader)
+	if err != nil {
+		return 0, err
+	}
+	res, err := strconv.ParseFloat(text, 64)
 	return res, err
 }
 
@@ -96,7 +114,29 @@ func main() {
 	}
 	env := environment.New(numAgents, waitTime, home)
 	fmt.Println("This is our environment, ", env)
+	fmt.Println("Please enter commands, write help for help")
 	for {
-
+		command, err := readCommand(reader)
+		if err != nil {
+			fmt.Println("Wrong command in input.", err)
+		}
+		switch command {
+		case "help":
+			fmt.Println("for adding location: location x y")
+			fmt.Println("for cycling time: cycle t")
+		case "cycle":
+			t, err := readFloat(reader)
+			if err != nil {
+				fmt.Println("invalid input", err)
+			}
+			tm := time.Duration(int64(math.Ceil(t * float64(time.Second))))
+			env.Cycle(tm)
+		case "location":
+			l, err := readLocation(reader)
+			if err != nil {
+				fmt.Println("invalid input", err)
+				env.AddNewLocation(l)
+			}
+		}
 	}
 }
