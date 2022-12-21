@@ -22,7 +22,7 @@ func New(agentsCount int, agentWait time.Duration, home command.Location) *Env {
 
 func (e *Env) AddNewLocation(l command.Location) {
 	bestAgent := 0
-	bestEta := time.Duration(1000 * 1000 * 1000) // or infinite duration
+	bestEta := time.Duration(1000 * 1000 * 1000 * 1000) // or infinite duration
 	for i, a := range e.Agents {
 		agentEta := a.RemainingTime() + agent.GetETA(l, a.LastLocation())
 		if agentEta < bestEta {
